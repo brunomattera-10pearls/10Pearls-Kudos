@@ -101,6 +101,15 @@
   @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(2px)} }
   .shake { animation: shake 0.35s ease; }
 
+
+  /* MODE TABS */
+  .mode-tabs { display: flex; gap: 0; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 24px; width: fit-content; }
+  .mode-tab { font-family: var(--font); font-size: 13px; font-weight: 700; padding: 10px 28px; background: transparent; color: var(--muted); border: none; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 8px; }
+  .mode-tab:hover { color: var(--text); }
+  .mode-tab.on { background: var(--green); color: #111110; }
+  .mode-panel { display: none; }
+  .mode-panel.visible { display: block; }
+
   /* TWO STEP FLOW */
   .step { transition: opacity 0.3s ease; }
   .step.hidden { display: none; }
@@ -126,6 +135,37 @@
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
+
+
+  // ── MODE SWITCHING ──
+  let currentMode = "ai";
+
+  function switchMode(mode) {
+    currentMode = mode;
+    document.getElementById("panelAI").classList.toggle("visible", mode === "ai");
+    document.getElementById("panelManual").classList.toggle("visible", mode === "manual");
+    document.getElementById("modeAI").classList.toggle("on", mode === "ai");
+    document.getElementById("modeManual").classList.toggle("on", mode === "manual");
+  }
+
+  // ── MANUAL GENERATE ──
+  function generateManual() {
+    const name   = document.getElementById("nameManual").value.trim();
+    const sender = document.getElementById("senderManual").value.trim();
+    const text   = document.getElementById("manualText").value.trim();
+    const msgBox = document.getElementById("msgBoxManual");
+
+    msgBox.textContent = ""; msgBox.className = "msg";
+
+    if (!text) {
+      document.getElementById("generateBtnManual").classList.add("shake");
+      setTimeout(() => document.getElementById("generateBtnManual").classList.remove("shake"), 400);
+      msgBox.textContent = T[uiLang].errFields; msgBox.className = "msg error"; return;
+    }
+
+    document.getElementById("kudosText").textContent = text;
+    showCard(text, name, sender);
+  }
 
 </script>
 </head>
@@ -165,68 +205,104 @@
 
   <!-- STEP 1: FORM -->
   <div id="step1" class="step">
-  <!-- GRID -->
-  <div class="grid">
 
-    <!-- COL IZQUIERDA -->
-    <div class="col">
-      <div class="card">
-        <div class="section-title-lg" id="st-who">Who?</div>
-        <div class="field">
-          <label id="lbl-name">Recipient name</label>
-          <input id="name" type="text" placeholder="e.g. María González" />
+    <!-- MODE TABS -->
+    <div class="mode-tabs">
+      <button class="mode-tab on" id="modeAI" onclick="switchMode('ai')">✦ <span id="lbl-mode-ai">AI Generate</span></button>
+      <button class="mode-tab" id="modeManual" onclick="switchMode('manual')">✎ <span id="lbl-mode-manual">Write it myself</span></button>
+    </div>
+
+    <!-- AI MODE -->
+    <div class="mode-panel visible" id="panelAI">
+      <div class="grid">
+        <div class="col">
+          <div class="card">
+            <div class="section-title-lg" id="st-who">Who?</div>
+            <div class="field">
+              <label id="lbl-name">Recipient name</label>
+              <input id="name" type="text" placeholder="e.g. María González" />
+            </div>
+            <div class="field">
+              <label id="lbl-sender">From</label>
+              <input id="sender" type="text" placeholder="e.g. Alex Rivera" />
+            </div>
+            <div class="field">
+              <label id="lbl-project">Project or area</label>
+              <input id="project" type="text" placeholder="e.g. Client Name, DevOps, HR…" />
+            </div>
+          </div>
         </div>
-        <div class="field">
-          <label id="lbl-sender">From</label>
-          <input id="sender" type="text" placeholder="e.g. Alex Rivera" />
+        <div class="col">
+          <div class="card">
+            <div class="section-title-lg" id="st-values">10Pearls Value</div>
+            <div class="pills">
+              <span class="pill" data-v="Innovation">🚀 Innovation</span>
+              <span class="pill" data-v="Collaboration">🤝 Collaboration</span>
+              <span class="pill" data-v="Excellence">⭐ Excellence</span>
+              <span class="pill" data-v="Integrity">🛡 Integrity</span>
+              <span class="pill" data-v="Customer Focus">💡 Customer Focus</span>
+              <span class="pill" data-v="Growth Mindset">📈 Growth Mindset</span>
+              <span class="pill" data-v="Ownership">🏆 Ownership</span>
+              <span class="pill" data-v="Inclusivity">🌍 Inclusivity</span>
+            </div>
+          </div>
         </div>
-        <div class="field">
-          <label id="lbl-project">Project or area</label>
-          <input id="project" type="text" placeholder="e.g. Client Name, DevOps, HR…" />
+        <div class="full">
+          <div class="card">
+            <div class="section-title-lg" id="st-what">What did they do?</div>
+            <div class="field">
+              <label id="lbl-desc">Brief description</label>
+              <textarea id="description" style="min-height:90px;" placeholder="e.g. Led the system migration without affecting users…"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="full">
+          <button class="btn-gen" id="generateBtn">
+            <span id="btnIcon">✦</span>
+            <span id="btnLabel">Generate Kudos</span>
+            <div class="dots" id="dots" style="display:none">
+              <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+          </button>
+          <div class="msg" id="msgBox"></div>
         </div>
       </div>
     </div>
 
-    <!-- COL DERECHA -->
-    <div class="col">
-      <div class="card">
-        <div class="section-title-lg" id="st-values">10Pearls Value</div>
-        <div class="pills">
-          <span class="pill" data-v="Innovation">🚀 Innovation</span>
-          <span class="pill" data-v="Collaboration">🤝 Collaboration</span>
-          <span class="pill" data-v="Excellence">⭐ Excellence</span>
-          <span class="pill" data-v="Integrity">🛡 Integrity</span>
-          <span class="pill" data-v="Customer Focus">💡 Customer Focus</span>
-          <span class="pill" data-v="Growth Mindset">📈 Growth Mindset</span>
-          <span class="pill" data-v="Ownership">🏆 Ownership</span>
-          <span class="pill" data-v="Inclusivity">🌍 Inclusivity</span>
+    <!-- MANUAL MODE -->
+    <div class="mode-panel" id="panelManual">
+      <div class="grid">
+        <div class="col">
+          <div class="card">
+            <div class="section-title-lg" id="st-who-m">Who?</div>
+            <div class="field">
+              <label id="lbl-name-m">Recipient name</label>
+              <input id="nameManual" type="text" placeholder="e.g. María González" />
+            </div>
+            <div class="field">
+              <label id="lbl-sender-m">From</label>
+              <input id="senderManual" type="text" placeholder="e.g. Alex Rivera" />
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card" style="display:flex;flex-direction:column;">
+            <div class="section-title-lg" id="st-text-m">Kudos text</div>
+            <div class="field" style="flex:1;display:flex;flex-direction:column;">
+              <textarea id="manualText" style="flex:1;min-height:100px;" placeholder="e.g. Working with María has been an absolute pleasure…"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="full">
+          <button class="btn-gen" id="generateBtnManual" onclick="generateManual()">
+            <span>✦</span>
+            <span id="btnLabelManual">Create Card</span>
+          </button>
+          <div class="msg" id="msgBoxManual"></div>
         </div>
       </div>
     </div>
 
-    <!-- WHAT — ancho completo -->
-    <div class="full">
-      <div class="card">
-        <div class="section-title-lg" id="st-what">What did they do?</div>
-        <div class="field">
-          <label id="lbl-desc">Brief description</label>
-          <textarea id="description" style="min-height:90px;" placeholder="e.g. Led the system migration without affecting users…"></textarea>
-        </div>
-      </div>
-    </div>
-
-    <div class="full">
-      <button class="btn-gen" id="generateBtn">
-        <span id="btnIcon">✦</span>
-        <span id="btnLabel">Generate Kudos</span>
-        <div class="dots" id="dots" style="display:none">
-          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-        </div>
-      </button>
-      <div class="msg" id="msgBox"></div>
-    </div>
-
-  </div>
   </div><!-- end step1 -->
 
   <!-- STEP 2: RESULT -->
@@ -247,8 +323,9 @@
           <canvas id="kudosCanvas" width="900" height="500"></canvas>
         </div>
         <div class="card-bottom-bar" style="margin-top:12px;">
-          <div class="result-actions">
-            <button class="btn-action" id="remixBtn"><span class="ico">↺</span> <span id="remix-lbl">Remix</span></button>
+          <div class="result-actions" id="aiActions">
+            <button class="btn-action" id="remixBtn"><span class="ico">↺</span> <span id="remix-lbl">Rewrite</span></button>
+            <button class="btn-action" id="undoBtn" style="display:none"><span>↩</span> <span id="undo-lbl">Undo</span></button>
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;">
             <button class="btn-download" id="downloadBtn">⬇ <span id="download-lbl">Download PNG</span></button>
@@ -267,11 +344,15 @@
     en: {
       subline:    "Recognize a teammate with an AI-generated kudos card, ready to share.",
       stWho:      "Who?", stWhat: "What did they do?", stValues: "10Pearls Value",
+      modeAI: "AI Generate", modeManual: "Write it myself",
+      stWhoM: "Who?", stTextM: "Kudos text",
+      lblNameM: "Recipient name", lblSenderM: "From",
+      btnManual: "Create Card",
       lblName:    "Recipient name", lblSender: "From (your name)", lblProject: "Project or area", lblDesc: "Brief description",
       placeName:  "e.g. John Smith", placeProject: "e.g. Client Name, DevOps, HR…",
       placeDesc:  "e.g. Led the system migration without affecting users…",
       btnGen:     "Generate Kudos", resultLbl: "✦ Your Kudos", copyLbl: "Copy", copiedLbl: "Copied",
-      remixLbl: "Remix", backLbl: "Back",
+      remixLbl: "Rewrite", undoLbl: "Undo", backLbl: "Back",
       newKudosLbl: "New Kudos", cardSectionLbl: "Image Card", tabClassic: "🏅 Classic", tabFun: "🎉 Fun", downloadLbl: "Download PNG", copyImgLbl: "Copy Image", copyImgDoneLbl: "Copied!",
       errFields:  "Please fill in at least the name and description.",
       errKey:     "API key missing. Open the file and add your Groq key.",
@@ -290,11 +371,15 @@
     es: {
       subline:    "Generá una tarjeta de reconocimiento con IA, lista para compartir.",
       stWho:      "¿A quién?", stWhat: "¿Qué hicieron?", stValues: "Valor de 10Pearls",
+      modeAI: "Generar con IA", modeManual: "Escribirlo yo",
+      stWhoM: "¿A quién?", stTextM: "Texto del kudos",
+      lblNameM: "Nombre del destinatario", lblSenderM: "De",
+      btnManual: "Crear tarjeta",
       lblName:    "Nombre del destinatario", lblSender: "De (tu nombre)", lblProject: "Proyecto o área", lblDesc: "Descripción breve",
       placeName:  "ej. María González", placeProject: "ej. Nombre del cliente, DevOps, HR…",
       placeDesc:  "ej. Lideró la migración del sistema sin afectar a usuarios…",
       btnGen:     "Generar Kudos", resultLbl: "✦ Tu Kudos", copyLbl: "Copiar", copiedLbl: "Copiado",
-      remixLbl: "Reescribir", backLbl: "Volver",
+      remixLbl: "Rewrite", undoLbl: "Deshacer", backLbl: "Volver",
       newKudosLbl: "Nuevo Kudos", cardSectionLbl: "Tarjeta de imagen", tabClassic: "🏅 Clásico", tabFun: "🎉 Divertido", downloadLbl: "Descargar PNG", copyImgLbl: "Copiar imagen", copyImgDoneLbl: "¡Copiada!",
       errFields:  "Completá al menos el nombre y la descripción.",
       errKey:     "Falta la API key. Abrí el archivo y agregá tu key de Groq.",
@@ -330,7 +415,15 @@
     document.getElementById("project").placeholder       = t.placeProject;
     document.getElementById("description").placeholder   = t.placeDesc;
     document.getElementById("btnLabel").textContent      = t.btnGen;
+    document.getElementById("lbl-mode-ai").textContent   = t.modeAI;
+    document.getElementById("lbl-mode-manual").textContent = t.modeManual;
+    document.getElementById("st-who-m").textContent      = t.stWhoM;
+    document.getElementById("st-text-m").textContent     = t.stTextM;
+    document.getElementById("lbl-name-m").textContent    = t.lblNameM;
+    document.getElementById("lbl-sender-m").textContent  = t.lblSenderM;
+    document.getElementById("btnLabelManual").textContent = t.btnManual;
     document.getElementById("remix-lbl").textContent     = t.remixLbl;
+    document.getElementById("undo-lbl").textContent      = t.undoLbl;
     document.getElementById("back-lbl").textContent      = t.backLbl;
     document.getElementById("card-section-lbl2").textContent = t.cardSectionLbl;
     document.getElementById("tab-classic").textContent = t.tabClassic;
@@ -420,7 +513,7 @@ Output only the kudos message.`;
       document.getElementById("kudosText").textContent = text;
       const card = document.getElementById("resultCard");
       card.classList.add("visible");
-      showCard(text, name, document.getElementById("sender").value.trim());
+      showCard(text, document.getElementById("name").value.trim(), document.getElementById("sender").value.trim());
       card.scrollIntoView({ behavior: "smooth", block: "nearest" });
     } catch (err) {
       msgBox.textContent = t.errGen + (err.message || ""); msgBox.className = "msg error";
@@ -440,8 +533,12 @@ Output only the kudos message.`;
   }
 
   // ── SHORTER / REMIX ──
+  let previousText = "";
+
   async function runAction(type) {
     const current = document.getElementById("kudosText").textContent.trim();
+    previousText = current;
+    document.getElementById("undoBtn").style.display = "inline-flex";
     if (!current) return;
 
     const btnId = type === "shorter" ? "shorterBtn" : "remixBtn";
@@ -479,6 +576,20 @@ Output only the kudos message.`;
 
   document.getElementById("remixBtn").addEventListener("click",  () => runAction("remix"));
 
+  document.getElementById("undoBtn").addEventListener("click", () => {
+    if (!previousText) return;
+    const current = document.getElementById("kudosText").textContent.trim();
+    document.getElementById("kudosText").textContent = previousText;
+    previousText = current;
+    const name   = currentMode === "manual"
+      ? document.getElementById("nameManual").value.trim()
+      : document.getElementById("name").value.trim();
+    const sender = currentMode === "manual"
+      ? document.getElementById("senderManual").value.trim()
+      : document.getElementById("sender").value.trim();
+    showCard(document.getElementById("kudosText").textContent, name, sender);
+  });
+
   // ── CARD STYLES ──
   let currentCardStyle = "classic";
 
@@ -487,8 +598,12 @@ Output only the kudos message.`;
     t.classList.add("on");
     currentCardStyle = t.dataset.style;
     const text = document.getElementById("kudosText").textContent.trim();
-    const name = document.getElementById("name").value.trim();
-    const sender = document.getElementById("sender").value.trim();
+    const name = currentMode === "manual"
+      ? document.getElementById("nameManual").value.trim()
+      : document.getElementById("name").value.trim();
+    const sender = currentMode === "manual"
+      ? document.getElementById("senderManual").value.trim()
+      : document.getElementById("sender").value.trim();
     if (text) drawCard(text, name, currentCardStyle, sender);
   }));
 
@@ -737,6 +852,8 @@ Output only the kudos message.`;
     document.getElementById("step1").classList.add("hidden");
     document.getElementById("step2").classList.remove("hidden");
     document.getElementById("resultCard").style.display = "block";
+    // Show/hide Rewrite+Undo based on mode
+    document.getElementById("aiActions").style.display = currentMode === "manual" ? "none" : "flex";
     drawCard(text, name, currentCardStyle, sender);
     window.scrollTo({top: 0, behavior: "smooth"});
   }
@@ -788,6 +905,37 @@ Output only the kudos message.`;
     document.getElementById("msgBox").textContent = "";
     window.scrollTo({top: 0, behavior: "smooth"});
   });
+
+
+  // ── MODE SWITCHING ──
+  let currentMode = "ai";
+
+  function switchMode(mode) {
+    currentMode = mode;
+    document.getElementById("panelAI").classList.toggle("visible", mode === "ai");
+    document.getElementById("panelManual").classList.toggle("visible", mode === "manual");
+    document.getElementById("modeAI").classList.toggle("on", mode === "ai");
+    document.getElementById("modeManual").classList.toggle("on", mode === "manual");
+  }
+
+  // ── MANUAL GENERATE ──
+  function generateManual() {
+    const name   = document.getElementById("nameManual").value.trim();
+    const sender = document.getElementById("senderManual").value.trim();
+    const text   = document.getElementById("manualText").value.trim();
+    const msgBox = document.getElementById("msgBoxManual");
+
+    msgBox.textContent = ""; msgBox.className = "msg";
+
+    if (!text) {
+      document.getElementById("generateBtnManual").classList.add("shake");
+      setTimeout(() => document.getElementById("generateBtnManual").classList.remove("shake"), 400);
+      msgBox.textContent = T[uiLang].errFields; msgBox.className = "msg error"; return;
+    }
+
+    document.getElementById("kudosText").textContent = text;
+    showCard(text, name, sender);
+  }
 
 </script>
 </body>
