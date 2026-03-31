@@ -219,7 +219,7 @@
           <div class="card">
             <div class="section-title-lg" id="st-who">Who?</div>
             <div class="field">
-              <label id="lbl-name">Recipient name</label>
+              <label id="lbl-name">To</label>
               <input id="name" type="text" placeholder="e.g. María González" />
             </div>
             <div class="field">
@@ -276,7 +276,7 @@
           <div class="card">
             <div class="section-title-lg" id="st-who-m">Who?</div>
             <div class="field">
-              <label id="lbl-name-m">Recipient name</label>
+              <label id="lbl-name-m">To</label>
               <input id="nameManual" type="text" placeholder="e.g. María González" />
             </div>
             <div class="field">
@@ -319,18 +319,22 @@
     </div>
     <div id="resultCard">
       <div id="kudosText" style="display:none"></div>
+        <div id="teams-hint" style="display:flex;align-items:center;gap:8px;background:rgba(212,255,39,0.06);border:1px solid rgba(212,255,39,0.15);border-radius:10px;padding:10px 16px;margin-bottom:12px;font-size:13px;color:var(--muted);">💬 <span id="teams-hint-text">Copy or download this card and share it in your Kudos channel on Microsoft Teams</span></div>
         <div class="canvas-wrap">
           <canvas id="kudosCanvas" width="900" height="500"></canvas>
         </div>
-        <div class="card-bottom-bar" style="margin-top:12px;">
-          <div class="result-actions" id="aiActions">
-            <button class="btn-action" id="remixBtn"><span class="ico">↺</span> <span id="remix-lbl">Rewrite</span></button>
-            <button class="btn-action" id="undoBtn" style="display:none"><span>↩</span> <span id="undo-lbl">Undo</span></button>
+        <div style="margin-top:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+            <div class="result-actions" id="aiActions">
+              <button class="btn-action" id="remixBtn"><span class="ico">↺</span> <span id="remix-lbl">Rewrite</span></button>
+              <button class="btn-action" id="undoBtn" style="display:none"><span>↩</span> <span id="undo-lbl">Undo</span></button>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="btn-download" id="downloadBtn">⬇ <span id="download-lbl">Download PNG</span></button>
+              <button class="btn-download" id="copyImgBtn">📋 <span id="copy-img-lbl">Copy Image</span></button>
+            </div>
           </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn-download" id="downloadBtn">⬇ <span id="download-lbl">Download PNG</span></button>
-            <button class="btn-download" id="copyImgBtn">📋 <span id="copy-img-lbl">Copy Image</span></button>
-          </div>
+
         </div>
     </div>
   </div><!-- end step2 -->
@@ -343,17 +347,17 @@
   const T = {
     en: {
       subline:    "Recognize a teammate with an AI-generated kudos card, ready to share.",
-      stWho:      "Who?", stWhat: "What did they do?", stValues: "10Pearls Value",
+      stWho:      "Who is this for?", stWhat: "What did they do?", stValues: "10Pearls Value",
       modeAI: "AI Generate", modeManual: "Write it myself",
-      stWhoM: "Who?", stTextM: "Kudos text",
-      lblNameM: "Recipient name", lblSenderM: "From",
+      stWhoM: "Who is this for?", stTextM: "Kudos text",
+      lblNameM: "To", lblSenderM: "From",
       btnManual: "Create Card",
-      lblName:    "Recipient name", lblSender: "From (your name)", lblProject: "Project or area", lblDesc: "Brief description",
-      placeName:  "e.g. John Smith", placeProject: "e.g. Client Name, DevOps, HR…",
+      lblName:    "To", lblSender: "From", lblProject: "Project or area", lblDesc: "Brief description",
+      placeName:  "e.g. María González", placeProject: "e.g. Client Name, DevOps, HR…",
       placeDesc:  "e.g. Led the system migration without affecting users…",
       btnGen:     "Generate Kudos", resultLbl: "✦ Your Kudos", copyLbl: "Copy", copiedLbl: "Copied",
       remixLbl: "Rewrite", undoLbl: "Undo", backLbl: "Back",
-      newKudosLbl: "New Kudos", cardSectionLbl: "Image Card", tabClassic: "🏅 Classic", tabFun: "🎉 Fun", downloadLbl: "Download PNG", copyImgLbl: "Copy Image", copyImgDoneLbl: "Copied!",
+      newKudosLbl: "New Kudos", cardSectionLbl: "Image Card", tabClassic: "🏅 Classic", tabFun: "🎉 Fun", downloadLbl: "Download PNG", copyImgLbl: "Copy Image", copyImgDoneLbl: "Copied!", teamsHint: "💬 Copy or download this card and share it in your Kudos channel on Microsoft Teams",
       errFields:  "Please fill in at least the name and description.",
       errKey:     "API key missing. Open the file and add your Groq key.",
       errGen:     "Error: ",
@@ -370,17 +374,17 @@
     },
     es: {
       subline:    "Generá una tarjeta de reconocimiento con IA, lista para compartir.",
-      stWho:      "¿A quién?", stWhat: "¿Qué hicieron?", stValues: "Valor de 10Pearls",
+      stWho:      "¿Para quién es?", stWhat: "¿Qué hicieron?", stValues: "Valor de 10Pearls",
       modeAI: "Generar con IA", modeManual: "Escribirlo yo",
-      stWhoM: "¿A quién?", stTextM: "Texto del kudos",
-      lblNameM: "Nombre del destinatario", lblSenderM: "De",
+      stWhoM: "¿Para quién es?", stTextM: "Texto del kudos",
+      lblNameM: "Para", lblSenderM: "De",
       btnManual: "Crear tarjeta",
-      lblName:    "Nombre del destinatario", lblSender: "De (tu nombre)", lblProject: "Proyecto o área", lblDesc: "Descripción breve",
+      lblName:    "Para", lblSender: "De", lblProject: "Proyecto o área", lblDesc: "Descripción breve",
       placeName:  "ej. María González", placeProject: "ej. Nombre del cliente, DevOps, HR…",
       placeDesc:  "ej. Lideró la migración del sistema sin afectar a usuarios…",
       btnGen:     "Generar Kudos", resultLbl: "✦ Tu Kudos", copyLbl: "Copiar", copiedLbl: "Copiado",
-      remixLbl: "Rewrite", undoLbl: "Deshacer", backLbl: "Volver",
-      newKudosLbl: "Nuevo Kudos", cardSectionLbl: "Tarjeta de imagen", tabClassic: "🏅 Clásico", tabFun: "🎉 Divertido", downloadLbl: "Descargar PNG", copyImgLbl: "Copiar imagen", copyImgDoneLbl: "¡Copiada!",
+      remixLbl: "Reescribir", undoLbl: "Deshacer", backLbl: "Volver",
+      newKudosLbl: "Nuevo Kudos", cardSectionLbl: "Tarjeta de imagen", tabClassic: "🏅 Clásico", tabFun: "🎉 Divertido", downloadLbl: "Descargar PNG", copyImgLbl: "Copiar imagen", copyImgDoneLbl: "¡Copiada!", teamsHint: "💬 Copiá o descargá esta tarjeta y compartila en el canal de Kudos de Microsoft Teams",
       errFields:  "Completá al menos el nombre y la descripción.",
       errKey:     "Falta la API key. Abrí el archivo y agregá tu key de Groq.",
       errGen:     "Error: ",
@@ -430,6 +434,7 @@
     document.getElementById("tab-fun2").textContent   = t.tabFun;
     document.getElementById("download-lbl").textContent = t.downloadLbl;
     document.getElementById("copy-img-lbl").textContent  = t.copyImgLbl;
+    document.getElementById("teams-hint-text").textContent = t.teamsHint.replace("💬 ", "");
     // Traducir pills de valores
     document.querySelectorAll(".pill").forEach(p => {
       const key = p.dataset.v;
@@ -686,22 +691,22 @@ Output only the kudos message.`;
       ctx.font = "500 12px 'Arial', sans-serif";
       ctx.fillStyle = "rgba(240,239,235,0.7)";
       let labelX = 48;
-      if (sender) {
-        ctx.fillText("From:", labelX, 90);
-        const fromLabelW = ctx.measureText("From:").width;
-        ctx.font = "bold 17px 'Arial', sans-serif";
-        ctx.fillStyle = "rgba(240,239,235,0.85)";
-        ctx.fillText(sender, labelX, 109);
-        const senderW = ctx.measureText(sender).width;
-        labelX += Math.max(fromLabelW, senderW) + 28;
-      }
       if (name) {
-        ctx.font = "500 12px 'Arial', sans-serif";
-        ctx.fillStyle = "rgba(240,239,235,0.7)";
         ctx.fillText("To:", labelX, 90);
+        const toLabelW = ctx.measureText("To:").width;
         ctx.font = "bold 17px 'Arial', sans-serif";
         ctx.fillStyle = "#D4FF27";
         ctx.fillText(name, labelX, 109);
+        const nameW = ctx.measureText(name).width;
+        labelX += Math.max(toLabelW, nameW) + 28;
+      }
+      if (sender) {
+        ctx.font = "500 12px 'Arial', sans-serif";
+        ctx.fillStyle = "rgba(240,239,235,0.7)";
+        ctx.fillText("From:", labelX, 90);
+        ctx.font = "bold 17px 'Arial', sans-serif";
+        ctx.fillStyle = "rgba(240,239,235,0.85)";
+        ctx.fillText(sender, labelX, 109);
       }
       nameRowH = 52;
     }
@@ -789,22 +794,22 @@ Output only the kudos message.`;
       let lx = 44;
       ctx.font = "500 12px 'Arial', sans-serif";
       ctx.fillStyle = "rgba(240,239,235,0.7)";
-      if (sender) {
-        ctx.fillText("From:", lx, 95);
-        const fl = ctx.measureText("From:").width;
-        ctx.font = "bold 17px 'Arial', sans-serif";
-        ctx.fillStyle = "rgba(240,239,235,0.85)";
-        ctx.fillText(sender, lx, 114);
-        const sl = ctx.measureText(sender).width;
-        lx += Math.max(fl, sl) + 28;
-      }
       if (name) {
-        ctx.font = "500 12px 'Arial', sans-serif";
-        ctx.fillStyle = "rgba(240,239,235,0.7)";
         ctx.fillText("To:", lx, 95);
+        const tl = ctx.measureText("To:").width;
         ctx.font = "bold 17px 'Arial', sans-serif";
         ctx.fillStyle = "#D4FF27";
         ctx.fillText(name, lx, 114);
+        const nl = ctx.measureText(name).width;
+        lx += Math.max(tl, nl) + 28;
+      }
+      if (sender) {
+        ctx.font = "500 12px 'Arial', sans-serif";
+        ctx.fillStyle = "rgba(240,239,235,0.7)";
+        ctx.fillText("From:", lx, 95);
+        ctx.font = "bold 17px 'Arial', sans-serif";
+        ctx.fillStyle = "rgba(240,239,235,0.85)";
+        ctx.fillText(sender, lx, 114);
       }
       funNameRowH = 50;
     }
